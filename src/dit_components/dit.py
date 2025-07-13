@@ -1,5 +1,5 @@
 from dit_components.dit_expert import DitModel
-
+from dit_components.dit_router import DITRouter
 class DIT:
     def __init__(self, experts: dict[str, DitModel]):
         self.table = experts
