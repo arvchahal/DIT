@@ -1,5 +1,5 @@
 from transformers import pipeline
-class DitModels():
+class DitModel():
     """
     main class for holding the transformer objects
     way to abstractly hold transformer models without actually having a direct reference to them
