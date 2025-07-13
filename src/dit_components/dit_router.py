@@ -1,7 +1,16 @@
 from routers.router import Router
+from transformers import pipeline
+from collections import defaultdict
+from dit_components.dit_expert import DitModel
+
 class DITRouter:
-    """
-    Implements a routing object allows us to vary different types of routers and still run the code
-    """
-    def init(self, router:Router):
-        self.router = router
+    def __init__(self, expert_table: dict[str, DitModel]):
+        self.expert_table = expert_table
+        #  zero-shot model for quick classification
+        self.zs = pipeline("zero-shot-classification",
+                           model="facebook/bart-large-mnli")
+
+    def route(self, query: str) -> str:
+        candidates = list(self.expert_table.keys())
+        res = self.zs(query, candidate_labels=candidates)
+        return res["labels"][0]

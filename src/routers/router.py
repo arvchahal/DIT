@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class Router(abc):
+class Router(ABC):
     """
     Base router class
     experts will be a list of strings that will be what our different models specialize in ie finance

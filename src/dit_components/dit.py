@@ -1,5 +1,10 @@
-class DIT():
-    """
-    The actual distributed inference table that holds all of the locations for the models and what not
-    """
-    # def init(self,)
+from dit_components.dit_expert import DitModel
+
+class DIT:
+    def __init__(self, experts: dict[str, DitModel]):
+        self.table = experts
+        self.router = DITRouter(self.table)
+
+    def exec(self, query: str):
+        key = self.router.route(query)
+        return self.table[key].run_model(query)
