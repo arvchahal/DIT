@@ -1,3 +1,7 @@
 env
 .lsp
 .clj-kondo
+src/.mypy_cache
+src/UNKNOWN.egg-info/
+src/.DS_Store
+.DS_Store
