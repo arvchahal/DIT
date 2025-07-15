@@ -1,9 +1,9 @@
-from dit_components import DitModel,DITRouter
-
+from dit_components import DitExpert,DITRouter
+from routers.router import Router
 class DIT:
-    def __init__(self, experts: dict[str, DitModel]):
+    def __init__(self, experts: dict[str, DitExpert],router:Router):
         self.table = experts
-        self.router = DITRouter(self.table)
+        self.router = DITRouter(self.table,router:Router)
 
     def exec(self, query: str):
         key = self.router.route(query)
