@@ -4,7 +4,7 @@ class DITOrchestrator():
     """
     The acutal inference engine that will bring all components together
     """
-    def init(self,router:DITRouter,table:DIT, ):
+    def __init__(self,router:DITRouter,table:DIT, ):
         self.router = router
         self.table = table
 
@@ -14,7 +14,8 @@ class DITOrchestrator():
         start_time = time.time()
         i =0
         responses = []
-        while i< len(queries) and int(time.time-start_time) <total_time:
+        while i< len(queries) and int(time.time()-start_time) <total_time:
             _response = self.table.exec(query=queries[i])
             responses.append(_response)
-        return response
+            i+=1
+        return responses
