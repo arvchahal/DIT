@@ -1,35 +1,38 @@
+# dit_components/dit_expert.py
 from transformers import pipeline
-class DitExpert():
-    """
-    main class for holding the transformer objects
-    way to abstractly hold transformer models without actually having a direct reference to them
-    in a table.
-    
-    model param should be the loaded model object 
-     
-    """
-    def init(self, model:any = None):
-        self.model  = model | None 
+from typing import Any, Optional
 
-    #either input the model object that is laoded or the link to load the model
-    @property
-    def load_model(self,model:any=None,task:str=None,model_name:str=None) ->bool:
-        if model:
+
+class DitExpert:
+    """
+    Thin wrapper around a HF pipeline or any callable model.
+    """
+
+    def __init__(self, model: Optional[Any] = None):
+        self.model: Optional[Any] = model
+
+    def load_model(
+        self,
+        *,
+        model: Optional[Any] = None,
+        task: Optional[str] = None,
+        model_name: Optional[str] = None,
+    ) -> None:
+        # path 1 ─ already-loaded object
+        if model is not None:
             self.model = model
+            return
 
-        else:
-            if not (task and model):
-                raise ValueError("Either a model object or task and model_name must be provided.")
-            try:
-                self.model = pipeline(task,model_name)
-            except Exception as e:
-                raise ValueError(f"Error loading model: {e}")
-        return True
-    
-    def run_model(self,query):
+        # path 2 ─ load from HF hub
+        if task is None or model_name is None:
+            raise ValueError("Provide either `model` or both `task` and `model_name`.")
+
+        try:
+            self.model = pipeline(task, model_name)
+        except Exception as exc:
+            raise RuntimeError(f"Error loading model: {exc}") from exc
+
+    def run_model(self, query: str):
+        if self.model is None:
+            raise RuntimeError("Model not loaded")
         return self.model(query)
-
-
-            
-            
-        

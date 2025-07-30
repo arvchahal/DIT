@@ -1,21 +1,20 @@
 import time
 from dit_components import DIT, DITRouter
-class DITOrchestrator():
-    """
-    The acutal inference engine that will bring all components together
-    """
-    def __init__(self,router:DITRouter,table:DIT, ):
-        self.router = router
-        self.table = table
 
-    def run(self, queries:list[str], total_time:int):
-        if len(queries)<1:
-            raise ValueError("Queries object must not be empty")
-        start_time = time.time()
-        i =0
-        responses = []
-        while i< len(queries) and int(time.time()-start_time) <total_time:
-            _response = self.table.exec(query=queries[i])
-            responses.append(_response)
-            i+=1
-        return responses
+
+class DITOrchestrator:
+    """Runs a batch of queries through a DIT instance, respecting a time budget."""
+
+    def __init__(self, dit: DIT):
+        self.dit = dit
+
+    def run(self, queries: list[str], total_time: int):
+        if not queries:
+            raise ValueError("Query list is empty")
+        start = time.time()
+        out = []
+        for q in queries:
+            if time.time() - start > total_time:
+                break
+            out.append(self.dit.exec(q))
+        return out
