@@ -1,4 +1,3 @@
-# dit_components/dit_expert.py
 from transformers import pipeline
 from typing import Any, Optional
 

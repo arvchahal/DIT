@@ -1,0 +1,8 @@
+syntax = "proto3";
+
+message request{
+    string request_id =1;
+    string model_id =2;
+    string payload =3;
+
+}

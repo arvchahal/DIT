@@ -1,0 +1,19 @@
+syntax="proto3";
+package dit;
+enum Status{
+    SUCCESS = 0;
+    FAILURE = 1;
+    ERROR = 2;
+}
+
+
+
+message response{
+    string request_id = 1;
+    string model_id =2;
+    string payload =3;
+    Status response_status = 4;
+    int64 latency_ms = 5;
+    optional string error_message = 6;
+
+}

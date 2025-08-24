@@ -1,13 +1,15 @@
-from dit_components import DitExpert, DITRouter
-from routers.router import Router
+from __future__ import annotations
 from typing import Dict
+from routers.router import Router
+from .dit_expert import DitExpert
+from .dit_router import DitRouter
 
 
 class DIT:
     def __init__(self, experts: Dict[str, DitExpert], router: Router):
         self.table = experts
         self._router = router  # keep reference
-        self.router_adapter = DITRouter(experts, router)
+        self.router_adapter = DitRouter(experts, router)
 
     @property
     def router(self) -> Router:
@@ -20,7 +22,7 @@ class DIT:
         Existing expert table is reused.
         """
         self._router = new_router
-        self.router_adapter = DITRouter(self.table, new_router)
+        self.router_adapter = DitRouter(self.table, new_router)
 
     def exec(self, query: str):
         key = self.router_adapter.route(query)

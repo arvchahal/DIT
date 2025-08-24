@@ -1,4 +1,4 @@
-from routers.router import Router
+from routers import Router
 import itertools
 
 

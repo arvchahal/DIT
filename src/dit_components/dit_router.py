@@ -4,7 +4,7 @@ from collections import defaultdict
 from dit_components import DitExpert
 
 
-class DITRouter:
+class DitRouter:
     def __init__(self, expert_table: dict[str, DitExpert], router: Router):
         self.expert_table = expert_table
         self.router: Router = router

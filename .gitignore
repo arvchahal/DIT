@@ -5,3 +5,5 @@ src/.mypy_cache
 src/UNKNOWN.egg-info/
 src/.DS_Store
 .DS_Store
+**/*pycache*
+test.egg-info
