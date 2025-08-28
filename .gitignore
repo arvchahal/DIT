@@ -1,9 +1,21 @@
-env
+# Python cache and build artifacts
+**/*pycache*
+src/.mypy_cache
+/.pytest_cache
+test.egg-info
+src/UNKNOWN.egg-info/
+
+# Virtual environments
+venv/
+.env
+
+# macOS system files
+.DS_Store
+src/.DS_Store
+
+# Editor and language server files
 .lsp
 .clj-kondo
+
+# Miscellaneous
 src/.mypy_cache
-src/UNKNOWN.egg-info/
-src/.DS_Store
-.DS_Store
-**/*pycache*
-test.egg-info

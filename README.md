@@ -14,3 +14,8 @@ A lightweight, modular framework for routing inference requests to specialized â
 git clone https://github.com/your-org/dit.git
 cd dit
 pip install -r requirements.txt
+```
+
+## Testing
+# Unit Tests
+Unit testing can be run with the command `pytest -q`.
