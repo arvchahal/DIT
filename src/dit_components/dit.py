@@ -26,4 +26,5 @@ class DIT:
 
     def exec(self, query: str):
         key = self.router_adapter.route(query)
-        return self.table[key].run_model(query)
+        response = self.table[key].run_model(query)
+        return {"response": response, "expert": key}
