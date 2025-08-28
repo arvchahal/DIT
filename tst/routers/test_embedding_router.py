@@ -43,3 +43,17 @@ def test_ties_break_by_order(router):
     for k in router.anchor_embeddings:
         router.anchor_embeddings[k] = same
     assert router.route("help") == "Payments"  # leftmost wins on tie
+
+def test_encoder_embedding_shape(): 
+    router = EmbeddingRouter(experts=["Payments", "Search", "Support"])
+    embedding = router._get_embedding("test query")
+    assert isinstance(embedding, np.ndarray)
+    assert embedding.ndim == 1
+    assert embedding.shape[0] == 384
+
+def test_actual_encoder_similarity():
+    router = EmbeddingRouter(experts=["Payments", "Search", "Support"])
+    embedding1 = router._get_embedding("test query 1")
+    embedding2 = router._get_embedding("test query 1")
+    similarity = router._cosine_sim(embedding1, embedding2)
+    assert np.isclose(similarity, 1.0, atol=1e-3)
