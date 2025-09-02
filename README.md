@@ -18,4 +18,4 @@ pip install -r requirements.txt
 
 ## Testing
 # Unit Tests
-Unit testing can be run with the command `pytest -q`.
+Unit testing can be run with the command `pytest`.

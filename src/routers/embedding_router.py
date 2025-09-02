@@ -12,7 +12,7 @@ class EmbeddingRouter(Router):
     sent to.
     """
     def __init__(self, *, experts: list[str]):
-        super().__init__(experts= experts)
+        super().__init__(experts=experts)
         self.tokenizer, self.encoder = self._init_encoder()
         self.agent_anchors_MRU_cache: deque[str] = deque(self.experts)
         self.anchor_embeddings: Dict[str, np.ndarray] = {}
