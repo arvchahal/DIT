@@ -2,14 +2,16 @@ from routers import Router
 
 class DomainRouter(Router):
     """
-    Domain Router uses domain information to rouate queries to the appropriate expert.
-    Prior domain knowledge for counts is necessary. (e.g. )
+    Domain Router uses domain information to route queries to the appropriate expert.
+    Prior domain knowledge for counts is necessary.
     """
-    def __init__(self, *, experts: list[str], mapping_expert_to_descriptors:dict[str, list[str]]):
+    def __init__(self, *, experts: list[str], mapping_expert_to_descriptors: dict[str, list[str]]):
         super().__init__(experts=experts)
+        self._init_domains(mapping_expert_to_descriptors)
+
+    def _init_domains(self, mapping_expert_to_descriptors: dict[str, list[str]]):
         self.domains = {}
         self.ambiguous_descriptors = set()
-
         for expert, descriptors in mapping_expert_to_descriptors.items():
             for descriptor in descriptors:
                 if descriptor in self.domains or descriptor in self.ambiguous_descriptors:

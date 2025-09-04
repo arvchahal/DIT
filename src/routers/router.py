@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import random
 
 
 class Router(ABC):
@@ -14,3 +15,9 @@ class Router(ABC):
     @abstractmethod
     def route(self, query: str) -> str:
         pass
+
+    def fallback(self) -> str:
+        """
+        Fallback method to handle routing when no expert is found.
+        """
+        return self.experts[random.randint(0, self.total_models - 1)]
