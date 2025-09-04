@@ -7,9 +7,6 @@ class DomainRouter(Router):
     """
     def __init__(self, *, experts: list[str], mapping_expert_to_descriptors: dict[str, list[str]]):
         super().__init__(experts=experts)
-        self._init_domains(mapping_expert_to_descriptors)
-
-    def _init_domains(self, mapping_expert_to_descriptors: dict[str, list[str]]):
         self.domains = {}
         self.ambiguous_descriptors = set()
         for expert, descriptors in mapping_expert_to_descriptors.items():
