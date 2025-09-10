@@ -11,7 +11,7 @@ A lightweight, modular framework for routing inference requests to specialized â
 ## Installation
 
 ```bash
-git clone https://github.com/your-org/dit.git
+git clone https://github.com/arvchahal/dit.git
 cd dit
 pip install -r requirements.txt
 ```
