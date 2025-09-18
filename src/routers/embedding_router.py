@@ -19,8 +19,10 @@ class EmbeddingRouter(Router):
         self._init_anchor_embeddings()
 
     def _init_encoder(self):
-        tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
-        model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+        # tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+        # model = AutoModel.from_pretrained("sentence-transformers/all-MiniLM-L6-v2")
+        tokenizer = AutoTokenizer.from_pretrained("sentence-transformers/paraphrase-MiniLM-L3-v2")
+        model = AutoModel.from_pretrained("sentence-transformers/paraphrase-MiniLM-L3-v2")
         return tokenizer, model
 
     def _get_embedding(self, text) -> np.ndarray:
