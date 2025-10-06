@@ -15,7 +15,7 @@ from routers.simple_router import SimpleRouter
 
 
 def load_queries(bank_dir: str, topic: str) -> list[str]:
-    """Load queries from data/query_banks/<topic>.csv (expects a 'queries' column)."""
+    """Load queries from data/query_banks/<topic>.csv (expects a 'question' column)."""
     path = os.path.join(bank_dir, f"{topic}.csv")
     if not os.path.exists(path):
         raise FileNotFoundError(f"No CSV found for topic '{topic}' at {path}")
@@ -24,13 +24,12 @@ def load_queries(bank_dir: str, topic: str) -> list[str]:
     with open(path, newline="") as f:
         reader = csv.DictReader(f)
         if "question" not in reader.fieldnames:
-            raise ValueError(f"{path} must contain a 'queries' column")
+            raise ValueError(f"{path} must contain a 'question' column")
         for row in reader:
-            q = row["questions"].strip()
+            q = row["question"].strip()
             if q:
                 queries.append(q)
     return queries
-
 
 def main():
     ap = argparse.ArgumentParser()
