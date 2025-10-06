@@ -1,0 +1,11 @@
+id,router,input,route_time,expert,result_or_error
+0,basic,query_0,0.000001,Payments,[Payments] query_0
+1,basic,query_1,0.000000,Payments,[Payments] query_1
+2,basic,query_2,0.000000,Payments,[Payments] query_2
+3,basic,query_3,0.000000,Payments,[Payments] query_3
+4,basic,query_4,0.000000,Payments,[Payments] query_4
+5,basic,query_5,0.000000,Payments,[Payments] query_5
+6,basic,query_6,0.000000,Payments,[Payments] query_6
+7,basic,query_7,0.000000,Payments,[Payments] query_7
+8,basic,query_8,0.000000,Payments,[Payments] query_8
+9,basic,query_9,0.000000,Payments,[Payments] query_9

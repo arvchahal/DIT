@@ -1,0 +1,5 @@
+id,router,input,route_time,expert,result_or_error
+0,basic,query_0,0.000001,Payments,[Payments] query_0
+1,basic,query_1,0.000000,Payments,ERROR: timeout after 3 tries
+2,basic,query_2,0.000008,Payments,ERROR: timeout after 3 tries
+3,basic,query_3,0.000003,Payments,ERROR: timeout after 3 tries

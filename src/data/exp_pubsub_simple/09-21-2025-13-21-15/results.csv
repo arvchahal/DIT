@@ -1,0 +1,13 @@
+id,router,input,route_time,expert,result_or_error
+0,simple,query_0,0.000001,Payments,ERROR: no responders (no subscriber for this model_id)
+1,simple,query_1,0.000001,Support,ERROR: timeout after 1 tries
+2,simple,query_2,0.000003,Search,ERROR: no responders (no subscriber for this model_id)
+3,simple,query_3,0.000000,Payments,ERROR: no responders (no subscriber for this model_id)
+4,simple,query_4,0.000000,Payments,"[{'label': 'NEGATIVE', 'score': 0.9799805283546448}]"
+5,simple,query_5,0.000003,Search,ERROR: no responders (no subscriber for this model_id)
+6,simple,query_6,0.000000,Payments,ERROR: no responders (no subscriber for this model_id)
+7,simple,query_7,0.000000,Payments,"[{'label': 'NEGATIVE', 'score': 0.9844838976860046}]"
+8,simple,query_8,0.000000,Search,ERROR: no responders (no subscriber for this model_id)
+9,simple,query_9,0.000000,Payments,ERROR: no responders (no subscriber for this model_id)
+10,simple,query_10,0.000000,Payments,"[{'label': 'NEGATIVE', 'score': 0.9840326905250549}]"
+11,simple,query_11,0.000001,Search,ERROR: no responders (no subscriber for this model_id)

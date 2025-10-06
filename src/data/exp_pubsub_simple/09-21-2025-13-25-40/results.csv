@@ -1,0 +1,13 @@
+id,router,input,route_time,expert,result_or_error
+0,simple,query_0,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9821625351905823}]"
+1,simple,query_1,0.000002,Payments,"[{'label': 'NEGATIVE', 'score': 0.9810247421264648}]"
+2,simple,query_2,0.000000,Payments,"[{'label': 'NEGATIVE', 'score': 0.9871548414230347}]"
+3,simple,query_3,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9846009612083435}]"
+4,simple,query_4,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9799805283546448}]"
+5,simple,query_5,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9812107086181641}]"
+6,simple,query_6,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9820656180381775}]"
+7,simple,query_7,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9844838976860046}]"
+8,simple,query_8,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9859245419502258}]"
+9,simple,query_9,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9816792011260986}]"
+10,simple,query_10,0.000001,Payments,"[{'label': 'NEGATIVE', 'score': 0.9840326905250549}]"
+11,simple,query_11,0.000000,Payments,"[{'label': 'NEGATIVE', 'score': 0.9801182746887207}]"
