@@ -1,6 +1,6 @@
+from typing import Optional, Any
 from transformers import pipeline
-from typing import Any, Optional
-
+import torch
 
 class DitExpert:
     """
@@ -26,10 +26,44 @@ class DitExpert:
         if task is None or model_name is None:
             raise ValueError("Provide either `model` or both `task` and `model_name`.")
 
+        # Try 4-bit quantized first, then 8-bit, then fallback full precision
         try:
-            self.model = pipeline(task, model_name)
-        except Exception as exc:
-            raise RuntimeError(f"Error loading model: {exc}") from exc
+            self.model = pipeline(
+                task,
+                model=model_name,
+                device_map="auto",             # automatically use GPU/CPU
+                torch_dtype=torch.float16,
+                low_cpu_mem_usage=True,
+                model_kwargs={
+                    "load_in_4bit": True,       # quantize to 4-bit
+                    "bnb_4bit_compute_dtype": torch.float16,
+                    "bnb_4bit_use_double_quant": True,
+                    "bnb_4bit_quant_type": "nf4",
+                },
+            )
+            print(f"[DitExpert] Loaded {model_name} in 4-bit quantized mode.")
+        except Exception as e4:
+            print(f"[DitExpert] 4-bit load failed ({e4}); trying 8-bit.")
+            try:
+                self.model = pipeline(
+                    task,
+                    model=model_name,
+                    device_map="auto",
+                    torch_dtype=torch.float16,
+                    low_cpu_mem_usage=True,
+                    model_kwargs={"load_in_8bit": True},
+                )
+                print(f"[DitExpert] Loaded {model_name} in 8-bit quantized mode.")
+            except Exception as e8:
+                print(f"[DitExpert] 8-bit load failed ({e8}); falling back to FP16.")
+                self.model = pipeline(
+                    task,
+                    model=model_name,
+                    device_map="auto",
+                    torch_dtype=torch.float16,
+                    low_cpu_mem_usage=True,
+                )
+                print(f"[DitExpert] Loaded {model_name} in FP16 (no quantization).")
 
     def run_model(self, query: str):
         if self.model is None:
