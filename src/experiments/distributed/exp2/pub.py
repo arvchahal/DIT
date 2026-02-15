@@ -1,14 +1,15 @@
 """
-Experiment 2: Monolith Baseline (Distributed)
-----------------------------------------------
-Sends ALL queries to a single "monolith" model (no routing decision).
-Used as a baseline to compare against DIT's multi-expert routing in Exp1.
+Experiment 2: Monolith Baseline (OpenAI API)
+---------------------------------------------
+Sends ALL queries to a single large model (GPT-4o-mini or GPT-4o) via
+the OpenAI API. No routing, no NATS — just one big model answering
+everything. Used as a baseline to compare against DIT's multi-expert
+routing in Exp1.
 
-Usage (with a single NATS worker running):
-  python pub.py --model-id monolith
-
-Echo mode (no NATS needed, for smoke testing):
-  python pub.py --model-id monolith --echo
+Usage:
+  export OPENAI_API_KEY=sk-...
+  python pub.py --model gpt-4o-mini
+  python pub.py --model gpt-4o
 """
 
 import os, sys, csv, time, argparse
@@ -18,8 +19,7 @@ THIS_DIR = os.path.dirname(__file__)
 SRC_ROOT = os.path.abspath(os.path.join(THIS_DIR, "..", "..", "..", ".."))
 sys.path.insert(0, os.path.join(SRC_ROOT, "src"))
 
-from microservice.publisher import Publisher, make_remote_callable
-from dit_components.dit_expert import DitExpert
+from openai import OpenAI
 
 
 def load_queries(csv_path: str) -> list[dict]:
@@ -38,30 +38,39 @@ def load_queries(csv_path: str) -> list[dict]:
     return rows
 
 
+def ask_openai(client: OpenAI, model: str, query: str,
+               max_tokens: int) -> str:
+    resp = client.chat.completions.create(
+        model=model,
+        messages=[{"role": "user", "content": query}],
+        max_tokens=max_tokens,
+        temperature=0.0,
+    )
+    return resp.choices[0].message.content.strip()
+
+
 def main():
-    ap = argparse.ArgumentParser(description="Exp2: Monolith Baseline Publisher")
-    ap.add_argument("--model-id", required=True,
-                    help="The single monolith expert's model ID")
-    ap.add_argument("--nats-url", default="nats://127.0.0.1:4222")
-    ap.add_argument("--timeout-ms", type=int, default=15000)
-    ap.add_argument("--retries", type=int, default=0)
+    ap = argparse.ArgumentParser(description="Exp2: Monolith Baseline (OpenAI)")
+    ap.add_argument("--model", default="gpt-4o-mini",
+                    help="OpenAI model to use (gpt-4o-mini, gpt-4o, etc.)")
+    ap.add_argument("--max-tokens", type=int, default=128)
     ap.add_argument("--queries-file",
                     default=os.path.join(SRC_ROOT, "data", "queries", "combined.csv"))
-    ap.add_argument("--echo", action="store_true",
-                    help="Use local echo expert instead of NATS (for testing)")
+    ap.add_argument("--api-key", default=None,
+                    help="OpenAI API key (or set OPENAI_API_KEY env var)")
     args = ap.parse_args()
+
+    api_key = args.api_key or os.environ.get("OPENAI_API_KEY")
+    if not api_key:
+        print("ERROR: Set OPENAI_API_KEY env var or pass --api-key")
+        sys.exit(1)
+
+    client = OpenAI(api_key=api_key)
 
     # Load queries
     queries = load_queries(args.queries_file)
     print(f"[pub] Loaded {len(queries)} queries from {args.queries_file}")
-
-    # Build single expert
-    if args.echo:
-        expert = DitExpert(model=lambda s: f"[ECHO {args.model_id}] {s}")
-    else:
-        publisher = Publisher(args.nats_url, timeout_ms=args.timeout_ms,
-                              max_retries=args.retries)
-        expert = DitExpert(model=make_remote_callable(publisher, args.model_id))
+    print(f"[pub] Model: {args.model}")
 
     # Output directory
     ts = datetime.now().strftime("%m-%d-%Y-%H-%M-%S")
@@ -84,7 +93,7 @@ def main():
 
             t_total = time.perf_counter()
             try:
-                response = expert.run_model(q)
+                response = ask_openai(client, args.model, q, args.max_tokens)
             except Exception as e:
                 response = f"ERROR: {e}"
             total_ms = (time.perf_counter() - t_total) * 1000
@@ -95,7 +104,7 @@ def main():
                 "router": "monolith",
                 "query_type": qrow["type"],
                 "query": q,
-                "selected_expert": args.model_id,
+                "selected_expert": args.model,
                 "response": response,
                 "oracle_response": qrow["oracle_response"],
                 "routing_latency_ms": 0.0,

@@ -1,16 +1,20 @@
 """
 Experiment Analysis Script
 --------------------------
-Computes accuracy metrics (BERTScore, BLEU, ROUGE-L) and generates
+Uses LLM-as-judge (OpenAI API) to score response accuracy, and generates
 latency/accuracy plots from Exp1 (router comparison) and optionally
 Exp2 (monolith baseline) CSV results.
 
 Usage:
-  python analyze.py --exp1-csv data/exp1_router_comparison/*/results.csv --out-dir /tmp/plots
+  export OPENAI_API_KEY=sk-...
+  python analyze.py --exp1-csv data/exp1_router_comparison/*/results.csv --out-dir ./plots
   python analyze.py --exp1-csv exp1.csv --exp2-csv exp2.csv --out-dir ./plots
+
+Skip scoring (just plot latency from already-scored CSV):
+  python analyze.py --exp1-csv scored_exp1.csv --skip-scoring --out-dir ./plots
 """
 
-import os, sys, argparse, glob
+import os, sys, argparse, glob, json, time
 
 THIS_DIR = os.path.dirname(__file__)
 SRC_ROOT = os.path.abspath(os.path.join(THIS_DIR, "..", "..", ".."))
@@ -23,7 +27,25 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 from matplotlib.lines import Line2D
 
-from evaluator.accuracy_metrics import bertscore_score, bleu_score, rouge_score_fn
+
+JUDGE_PROMPT = """\
+You are an impartial judge evaluating response quality.
+
+Given a question, a candidate response, and a reference (oracle) response,
+score the candidate on a scale of 1-5:
+  1 = Completely wrong or irrelevant
+  2 = Partially relevant but mostly incorrect
+  3 = Somewhat correct but missing key information
+  4 = Mostly correct with minor issues
+  5 = Fully correct and complete
+
+Question: {question}
+
+Reference answer: {oracle}
+
+Candidate response: {response}
+
+Reply with ONLY a JSON object: {{"score": <1-5>, "reason": "<brief explanation>"}}"""
 
 
 def load_csv(pattern: str) -> pd.DataFrame:
@@ -37,35 +59,45 @@ def load_csv(pattern: str) -> pd.DataFrame:
     return df
 
 
-def compute_metrics(df: pd.DataFrame) -> pd.DataFrame:
-    """Add per-row BLEU, ROUGE-L, and per-group BERTScore F1 columns."""
-    # Drop rows with missing responses or oracle
+def score_with_llm(df: pd.DataFrame, client, model: str,
+                   batch_size: int = 20) -> pd.DataFrame:
+    """Add 'llm_score' (1-5) and 'llm_reason' columns via LLM-as-judge."""
     mask = df["response"].notna() & df["oracle_response"].notna()
     mask &= ~df["response"].astype(str).str.startswith("ERROR:")
     df = df[mask].copy()
     df["response"] = df["response"].astype(str)
     df["oracle_response"] = df["oracle_response"].astype(str)
 
-    # BLEU (per row)
-    df["bleu"] = df.apply(
-        lambda r: bleu_score(r["response"], r["oracle_response"]), axis=1
-    )
+    scores = []
+    reasons = []
+    total = len(df)
 
-    # ROUGE-L F1 (per row)
-    df["rouge_l_f1"] = df.apply(
-        lambda r: rouge_score_fn(r["response"], r["oracle_response"])["rougeL"].fmeasure,
-        axis=1,
-    )
+    for i, (_, row) in enumerate(df.iterrows()):
+        prompt = JUDGE_PROMPT.format(
+            question=row["query"],
+            oracle=row["oracle_response"],
+            response=row["response"],
+        )
+        try:
+            resp = client.chat.completions.create(
+                model=model,
+                messages=[{"role": "user", "content": prompt}],
+                max_tokens=100,
+                temperature=0.0,
+            )
+            text = resp.choices[0].message.content.strip()
+            parsed = json.loads(text)
+            scores.append(int(parsed["score"]))
+            reasons.append(parsed.get("reason", ""))
+        except Exception as e:
+            scores.append(0)
+            reasons.append(f"scoring error: {e}")
 
-    # BERTScore F1 (batch per router for efficiency)
-    df["bertscore_f1"] = 0.0
-    for router_name, group in df.groupby("router"):
-        candidates = group["response"].tolist()
-        references = group["oracle_response"].tolist()
-        _, _, f1_list = bertscore_score(candidates, references)
-        f1_vals = [float(v) for v in f1_list]
-        df.loc[group.index, "bertscore_f1"] = f1_vals
+        if (i + 1) % batch_size == 0:
+            print(f"    Scored {i + 1}/{total} ...")
 
+    df["llm_score"] = scores
+    df["llm_reason"] = reasons
     return df
 
 
@@ -103,16 +135,16 @@ def plot_cdf(df: pd.DataFrame, col: str, xlabel: str, title: str,
 
 
 def plot_accuracy_bars(df: pd.DataFrame, out_path: str):
-    """Bar chart of mean BERTScore F1 per router."""
-    means = df.groupby("router")["bertscore_f1"].mean().sort_values(ascending=False)
+    """Bar chart of mean LLM score per router."""
+    means = df.groupby("router")["llm_score"].mean().sort_values(ascending=False)
     plt.figure(figsize=(8, 5))
     bars = plt.bar(means.index, means.values, color=plt.cm.tab10.colors[:len(means)])
     for bar, val in zip(bars, means.values):
-        plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.005,
-                 f"{val:.3f}", ha="center", va="bottom", fontsize=9)
-    plt.ylabel("Mean BERTScore F1")
-    plt.title("Accuracy by Router Strategy (BERTScore F1)")
-    plt.ylim(0, max(means.values.max() + 0.05, 1.0))
+        plt.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.02,
+                 f"{val:.2f}", ha="center", va="bottom", fontsize=9)
+    plt.ylabel("Mean LLM Judge Score (1-5)")
+    plt.title("Response Accuracy by Router Strategy")
+    plt.ylim(0, 5.5)
     plt.grid(axis="y", alpha=0.3)
     plt.tight_layout()
     plt.savefig(out_path, dpi=150)
@@ -121,13 +153,14 @@ def plot_accuracy_bars(df: pd.DataFrame, out_path: str):
 
 
 def plot_accuracy_by_domain(df: pd.DataFrame, out_path: str):
-    """Grouped bar chart: router x domain for BERTScore F1."""
-    pivot = df.groupby(["query_type", "router"])["bertscore_f1"].mean().unstack()
+    """Grouped bar chart: router x domain for LLM score."""
+    pivot = df.groupby(["query_type", "router"])["llm_score"].mean().unstack()
     ax = pivot.plot(kind="bar", figsize=(12, 6), width=0.8)
-    ax.set_ylabel("Mean BERTScore F1")
+    ax.set_ylabel("Mean LLM Judge Score (1-5)")
     ax.set_xlabel("Query Domain")
-    ax.set_title("Accuracy by Domain and Router Strategy")
+    ax.set_title("Response Accuracy by Domain and Router Strategy")
     ax.legend(title="Router")
+    ax.set_ylim(0, 5.5)
     ax.grid(axis="y", alpha=0.3)
     plt.xticks(rotation=30, ha="right")
     plt.tight_layout()
@@ -138,42 +171,55 @@ def plot_accuracy_by_domain(df: pd.DataFrame, out_path: str):
 
 def plot_dit_vs_monolith(exp1: pd.DataFrame, exp2: pd.DataFrame, out_path: str):
     """Side-by-side comparison bars: DIT (best router) vs Monolith."""
-    # Pick best DIT router by BERTScore
-    dit_means = exp1.groupby("router")["bertscore_f1"].mean()
+    dit_means = exp1.groupby("router")["llm_score"].mean()
     best_router = dit_means.idxmax()
     dit_best = exp1[exp1["router"] == best_router]
 
-    labels = ["BERTScore F1", "BLEU", "ROUGE-L F1", "Total Latency (ms)"]
+    labels = ["LLM Score (1-5)", "Total Latency p50 (ms)"]
     dit_vals = [
-        dit_best["bertscore_f1"].mean(),
-        dit_best["bleu"].mean(),
-        dit_best["rouge_l_f1"].mean(),
+        dit_best["llm_score"].mean(),
         dit_best["total_latency_ms"].median(),
     ]
     mono_vals = [
-        exp2["bertscore_f1"].mean(),
-        exp2["bleu"].mean(),
-        exp2["rouge_l_f1"].mean(),
+        exp2["llm_score"].mean(),
         exp2["total_latency_ms"].median(),
     ]
 
-    x = np.arange(len(labels))
+    fig, axes = plt.subplots(1, 2, figsize=(12, 5))
+
+    # Accuracy comparison
+    ax = axes[0]
+    x = np.arange(1)
     width = 0.35
-
-    fig, ax = plt.subplots(figsize=(10, 6))
-    bars1 = ax.bar(x - width / 2, dit_vals, width, label=f"DIT ({best_router})")
-    bars2 = ax.bar(x + width / 2, mono_vals, width, label="Monolith")
-
-    for bars in [bars1, bars2]:
-        for bar in bars:
-            ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + 0.005,
-                    f"{bar.get_height():.3f}", ha="center", va="bottom", fontsize=8)
-
+    b1 = ax.bar(x - width/2, [dit_vals[0]], width, label=f"DIT ({best_router})")
+    b2 = ax.bar(x + width/2, [mono_vals[0]], width, label="Monolith")
+    ax.set_ylabel("Mean LLM Judge Score")
+    ax.set_title("Accuracy: DIT vs Monolith")
     ax.set_xticks(x)
-    ax.set_xticklabels(labels)
+    ax.set_xticklabels(["LLM Score"])
+    ax.set_ylim(0, 5.5)
     ax.legend()
-    ax.set_title("DIT vs Monolith Comparison")
     ax.grid(axis="y", alpha=0.3)
+    for b in [b1, b2]:
+        for bar in b:
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.05,
+                    f"{bar.get_height():.2f}", ha="center", va="bottom", fontsize=9)
+
+    # Latency comparison
+    ax = axes[1]
+    b1 = ax.bar(x - width/2, [dit_vals[1]], width, label=f"DIT ({best_router})")
+    b2 = ax.bar(x + width/2, [mono_vals[1]], width, label="Monolith")
+    ax.set_ylabel("Median Total Latency (ms)")
+    ax.set_title("Latency: DIT vs Monolith")
+    ax.set_xticks(x)
+    ax.set_xticklabels(["p50 Latency"])
+    ax.legend()
+    ax.grid(axis="y", alpha=0.3)
+    for b in [b1, b2]:
+        for bar in b:
+            ax.text(bar.get_x() + bar.get_width()/2, bar.get_height() + 0.5,
+                    f"{bar.get_height():.1f}", ha="center", va="bottom", fontsize=9)
+
     plt.tight_layout()
     plt.savefig(out_path, dpi=150)
     plt.close()
@@ -189,9 +235,8 @@ def print_summary(df: pd.DataFrame, label: str = ""):
 
     summary = df.groupby("router").agg(
         count=("id", "count"),
-        bertscore_f1_mean=("bertscore_f1", "mean"),
-        bleu_mean=("bleu", "mean"),
-        rouge_l_f1_mean=("rouge_l_f1", "mean"),
+        llm_score_mean=("llm_score", "mean"),
+        llm_score_std=("llm_score", "std"),
         routing_latency_p50=("routing_latency_ms", "median"),
         routing_latency_p95=("routing_latency_ms", lambda x: np.percentile(x, 95)),
         total_latency_p50=("total_latency_ms", "median"),
@@ -212,6 +257,12 @@ def main():
                     help="Glob pattern for Exp2 (monolith) results CSV(s)")
     ap.add_argument("--out-dir", default="./analysis_output",
                     help="Directory for output plots")
+    ap.add_argument("--judge-model", default="gpt-4o-mini",
+                    help="OpenAI model for LLM-as-judge scoring")
+    ap.add_argument("--skip-scoring", action="store_true",
+                    help="Skip LLM scoring (use existing llm_score column)")
+    ap.add_argument("--api-key", default=None,
+                    help="OpenAI API key (or set OPENAI_API_KEY env var)")
     args = ap.parse_args()
 
     os.makedirs(args.out_dir, exist_ok=True)
@@ -225,11 +276,30 @@ def main():
         print("[analyze] Loading Exp2 data ...")
         exp2 = load_csv(args.exp2_csv)
 
-    # Compute metrics
-    print("[analyze] Computing accuracy metrics (this may take a while) ...")
-    exp1 = compute_metrics(exp1)
-    if exp2 is not None:
-        exp2 = compute_metrics(exp2)
+    # Score with LLM
+    if not args.skip_scoring:
+        api_key = args.api_key or os.environ.get("OPENAI_API_KEY")
+        if not api_key:
+            print("ERROR: Set OPENAI_API_KEY env var or pass --api-key")
+            sys.exit(1)
+
+        from openai import OpenAI
+        client = OpenAI(api_key=api_key)
+
+        print(f"[analyze] Scoring Exp1 with {args.judge_model} ...")
+        exp1 = score_with_llm(exp1, client, args.judge_model)
+
+        # Save scored CSV so you don't have to re-score
+        scored_path = os.path.join(args.out_dir, "exp1_scored.csv")
+        exp1.to_csv(scored_path, index=False)
+        print(f"  Saved scored CSV: {scored_path}")
+
+        if exp2 is not None:
+            print(f"[analyze] Scoring Exp2 with {args.judge_model} ...")
+            exp2 = score_with_llm(exp2, client, args.judge_model)
+            scored_path = os.path.join(args.out_dir, "exp2_scored.csv")
+            exp2.to_csv(scored_path, index=False)
+            print(f"  Saved scored CSV: {scored_path}")
 
     # Plots
     print("[analyze] Generating plots ...")
@@ -242,11 +312,17 @@ def main():
              "CDF of Routing Latency per Router Strategy",
              os.path.join(args.out_dir, "cdf_routing_latency.png"))
 
-    plot_accuracy_bars(exp1, os.path.join(args.out_dir, "accuracy_bertscore.png"))
+    plot_accuracy_bars(exp1, os.path.join(args.out_dir, "accuracy_scores.png"))
 
     plot_accuracy_by_domain(exp1, os.path.join(args.out_dir, "accuracy_by_domain.png"))
 
     if exp2 is not None:
+        # Combined CDF with monolith included
+        combined = pd.concat([exp1, exp2], ignore_index=True)
+        plot_cdf(combined, "total_latency_ms", "Total Latency (ms)",
+                 "CDF of Total Latency: All Strategies + Monolith",
+                 os.path.join(args.out_dir, "cdf_total_latency_combined.png"))
+
         plot_dit_vs_monolith(exp1, exp2,
                              os.path.join(args.out_dir, "dit_vs_monolith.png"))
 
