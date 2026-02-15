@@ -81,6 +81,16 @@ def build_callable(task: str, hf_pipeline, model_name: str,
 
         return text_gen
 
+    elif task == "text2text-generation":
+        def text2text(query: str) -> str:
+            out = hf_pipeline(query.strip(), max_new_tokens=max_new_tokens,
+                              truncation=True)
+            if isinstance(out, list) and out and isinstance(out[0], dict):
+                return out[0].get("generated_text", str(out[0]))
+            return str(out)
+
+        return text2text
+
     elif task == "text-classification":
         def classify(query: str) -> str:
             out = hf_pipeline(query.strip(), truncation=True)

@@ -6,10 +6,10 @@ Sends queries from data/queries/combined.csv through 4 routing strategies
 workers running via NATS.
 
 Usage (with NATS workers running):
-  python pub.py --experts travel sports personal_finance literature
+  python pub.py --experts flan-t5 biomedlm tinyllama law-llm
 
 Echo mode (no NATS needed, for smoke testing):
-  python pub.py --experts travel sports personal_finance literature --echo --cycles 1
+  python pub.py --experts flan-t5 biomedlm tinyllama law-llm --echo --cycles 1
 """
 
 import os, sys, csv, json, time, argparse
@@ -28,22 +28,22 @@ from routers.domain_router import DomainRouter
 from routers.domain_simplified_router import DomainSimplifiedRouter
 
 DEFAULT_MAPPING = {
-    "travel": [
+    "flan-t5": [
         "travel", "country", "city", "airport", "tourism", "destination",
         "flight", "hotel", "visa", "landmark", "continent", "island",
         "ocean", "border", "capital", "resort", "cruise", "passport",
     ],
-    "sports": [
+    "biomedlm": [
         "sports", "game", "team", "player", "score", "match", "league",
         "championship", "tournament", "coach", "athlete", "stadium",
         "goal", "medal", "race", "olympic", "season", "draft",
     ],
-    "personal_finance": [
+    "tinyllama": [
         "finance", "money", "invest", "stock", "bank", "loan", "credit",
         "debt", "savings", "budget", "interest", "mortgage", "tax",
         "retirement", "portfolio", "dividend", "income", "expense",
     ],
-    "literature": [
+    "law-llm": [
         "literature", "book", "novel", "author", "poem", "story", "writer",
         "fiction", "chapter", "genre", "literary", "publish", "library",
         "narrative", "prose", "character", "essay", "playwright",
