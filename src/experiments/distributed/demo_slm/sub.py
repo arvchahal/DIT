@@ -79,15 +79,28 @@ async def amain():
 
         # Apply chat template if tokenizer supports it (better instruction following)
         if tokenizer is not None and hasattr(tokenizer, "apply_chat_template"):
-            messages = [
-                {"role": "system", "content": "You are a concise assistant. Answer directly."},
-                {"role": "user", "content": prompt_text},
-            ]
-            prompt_text = tokenizer.apply_chat_template(
-                messages,
-                tokenize=False,
-                add_generation_prompt=True,  # adds assistant prefix
-            )
+            try:
+                # Try system + user messages first (for models like Llama 3)
+                messages = [
+                    {"role": "user", "content": prompt_text},
+                ]
+                prompt_text = tokenizer.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,
+                )
+            except Exception as e:
+                # Fallback for models that don't support 'system' role (like Gemma)
+                print(f"[worker] Chat template issue ({e}); retrying without system role.")
+                messages = [
+                    {"role": "user", "content": "You are a concise assistant. Answer directly.\n\n" + prompt_text},
+                ]
+                prompt_text = tokenizer.apply_chat_template(
+                    messages,
+                    tokenize=False,
+                    add_generation_prompt=True,
+                )
+
 
         out = hf_pipeline(
             prompt_text,
