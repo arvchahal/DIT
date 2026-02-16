@@ -16,6 +16,7 @@ class DitExpert:
         model: Optional[Any] = None,
         task: Optional[str] = None,
         model_name: Optional[str] = None,
+        quantize: Optional[str] = None,
     ) -> None:
         # path 1 ─ already-loaded object
         if model is not None:
@@ -26,41 +27,30 @@ class DitExpert:
         if task is None or model_name is None:
             raise ValueError("Provide either `model` or both `task` and `model_name`.")
 
-        # Try 4-bit quantized first, then 8-bit, then fallback full precision
-        try:
+        if quantize == "8bit":
             self.model = pipeline(
-                    task,
-                    model=model_name,
-                    device_map="auto",
-                    torch_dtype=torch.float16,
-                )
+                task,
+                model=model_name,
+                device_map="auto",
+                model_kwargs={"load_in_8bit": True},
+            )
+            print(f"[DitExpert] Loaded {model_name} in 8-bit quantized mode.")
+        elif quantize == "4bit":
+            self.model = pipeline(
+                task,
+                model=model_name,
+                device_map="auto",
+                model_kwargs={"load_in_4bit": True},
+            )
+            print(f"[DitExpert] Loaded {model_name} in 4-bit quantized mode.")
+        else:
+            self.model = pipeline(
+                task,
+                model=model_name,
+                device_map="auto",
+                torch_dtype=torch.float16,
+            )
             print(f"[DitExpert] Loaded {model_name} in FP16 (no quantization).")
-        #     self.model = pipeline(
-        #         task,
-        #         model=model_name,
-        #         device_map="auto",             # automatically use GPU/CPU
-        #         torch_dtype=torch.float16,
-        #         model_kwargs={
-        #         },
-        #     )
-        #     print(f"[DitExpert] Loaded {model_name} in 4-bit quantized mode.")
-        except Exception as e4:
-            print(f"[DitExpert] 4-bit load ({e4}); trying 8-bit.")
-        #     try:
-        #         self.model = pipeline(
-        #             task,
-        #             model=model_name,
-        #             device_map="auto",
-        #             torch_dtype=torch.float16,                )
-        #     except Exception as e8:
-        #         print(f"[DitExpert] 8-bit load failed ({e8}); falling back to FP16.")
-        #         self.model = pipeline(
-        #             task,
-        #             model=model_name,
-        #             device_map="auto",
-        #             torch_dtype=torch.float16,
-        #         )
-        #         print(f"[DitExpert] Loaded {model_name} in FP16 (no quantization).")
 
     def run_model(self, query: str):
         if self.model is None:
