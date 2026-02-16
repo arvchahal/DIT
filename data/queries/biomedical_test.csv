@@ -1,0 +1,11 @@
+type,question,oracle_response
+biomedical,What is the mechanism of action of metformin in type 2 diabetes?,Metformin reduces hepatic glucose production and increases insulin sensitivity
+biomedical,What are the symptoms of myocardial infarction?,Chest pain radiating to left arm jaw shortness of breath sweating nausea
+biomedical,How does CRISPR-Cas9 gene editing work?,Cas9 protein uses guide RNA to locate and cut specific DNA sequences
+biomedical,What is the role of p53 in cancer suppression?,p53 is a tumor suppressor that induces apoptosis in damaged cells
+biomedical,What causes antibiotic resistance in bacteria?,Genetic mutations and horizontal gene transfer allow bacteria to survive antibiotics
+biomedical,What is the blood-brain barrier and its function?,Selective semipermeable border that protects the brain from pathogens and toxins
+biomedical,How do mRNA vaccines work?,mRNA instructs cells to produce spike protein triggering immune response
+biomedical,What is the difference between Type 1 and Type 2 diabetes?,Type 1 is autoimmune destruction of beta cells Type 2 is insulin resistance
+biomedical,What are the stages of clinical trials?,Phase 1 safety Phase 2 efficacy Phase 3 large scale Phase 4 post market
+biomedical,What is the role of hemoglobin in oxygen transport?,Hemoglobin binds oxygen in lungs and releases it in tissues

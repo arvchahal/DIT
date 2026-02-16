@@ -60,9 +60,7 @@ def build_callable(task: str, hf_pipeline, model_name: str,
                         messages, tokenize=False, add_generation_prompt=True
                     )
                 except Exception:
-                    prompt = f"Q: {prompt}\nA:"
-            else:
-                prompt = f"Q: {prompt}\nA:"
+                    prompt = f"You are a helpful assistant.\n\n{prompt}"
 
             out = hf_pipeline(
                 prompt,
@@ -145,16 +143,13 @@ async def amain():
                     help="HF model id (e.g., google/gemma-2b-it)")
     ap.add_argument("--max-new-tokens", type=int, default=64)
     ap.add_argument("--temperature", type=float, default=0.0)
-    ap.add_argument("--quantize", choices=["8bit", "4bit"], default=None,
-                    help="Quantize model: 8bit or 4bit (requires bitsandbytes)")
     args = ap.parse_args()
 
     maybe_login(args.hf_token)
 
     # Load model
     expert = DitExpert()
-    expert.load_model(task=args.task, model_name=args.model_name,
-                      quantize=args.quantize)
+    expert.load_model(task=args.task, model_name=args.model_name)
     hf_pipeline = expert.model
 
     # Build task-appropriate callable
