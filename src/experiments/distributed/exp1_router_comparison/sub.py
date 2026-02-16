@@ -60,7 +60,9 @@ def build_callable(task: str, hf_pipeline, model_name: str,
                         messages, tokenize=False, add_generation_prompt=True
                     )
                 except Exception:
-                    prompt = f"You are a helpful assistant.\n\n{prompt}"
+                    prompt = f"Q: {prompt}\nA:"
+            else:
+                prompt = f"Q: {prompt}\nA:"
 
             out = hf_pipeline(
                 prompt,
