@@ -8,11 +8,11 @@ src/UNKNOWN.egg-info/
 # Virtual environments
 venv/
 .env
-
+env/
 # macOS system files
 .DS_Store
 src/.DS_Store
-
+data/exp*
 # Editor and language server files
 .lsp
 .clj-kondo

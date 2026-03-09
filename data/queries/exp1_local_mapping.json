@@ -1,0 +1,31 @@
+{
+    "biomedlm": [
+        "medical", "medicine", "disease", "symptom", "treatment", "drug",
+        "clinical", "patient", "diagnosis", "therapy", "cancer", "diabetes",
+        "vaccine", "immune", "blood", "gene", "protein", "cell",
+        "antibiotic", "cholesterol", "insulin", "stroke", "hemoglobin",
+        "chemotherapy", "autoimmune", "mRNA", "CRISPR", "metformin",
+        "p53", "brain", "barrier", "statin", "trial"
+    ],
+    "travel": [
+        "travel", "tourist", "visa", "flight", "hotel", "destination",
+        "country", "city", "airport", "cruise", "passport", "backpacking",
+        "vacation", "trip", "island", "landmark", "currency", "jet",
+        "attractions", "solo", "national", "park", "Europe", "Asia",
+        "Greece", "Italy", "London", "Paris", "Thailand", "Africa"
+    ],
+    "finance": [
+        "finance", "money", "invest", "stock", "bank", "loan", "credit",
+        "debt", "savings", "budget", "interest", "mortgage", "tax",
+        "retirement", "portfolio", "dividend", "income", "expense",
+        "IRA", "Roth", "compound", "mutual", "fund", "bond",
+        "inflation", "Federal", "Reserve", "ETF", "bull", "bear"
+    ],
+    "grammar": [
+        "dont", "doesnt", "wasnt", "isnt", "arent", "wont", "cant",
+        "its", "their", "there", "theyre", "your", "youre",
+        "weather", "wether", "becuse", "becaus", "allready",
+        "alot", "improvment", "desicion", "immediatly", "responsibilitys",
+        "grocerys", "policys", "informations", "accurrate", "homwork"
+    ]
+}

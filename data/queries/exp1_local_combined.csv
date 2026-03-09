@@ -1,0 +1,61 @@
+type,question,oracle_response
+biomedical,What is the mechanism of action of metformin in type 2 diabetes?,Metformin reduces hepatic glucose production and increases insulin sensitivity
+biomedical,What are the symptoms of myocardial infarction?,Chest pain radiating to left arm jaw shortness of breath sweating nausea
+biomedical,How does CRISPR-Cas9 gene editing work?,Cas9 protein uses guide RNA to locate and cut specific DNA sequences
+biomedical,What is the role of p53 in cancer suppression?,p53 is a tumor suppressor that induces apoptosis in damaged cells
+biomedical,What causes antibiotic resistance in bacteria?,Genetic mutations and horizontal gene transfer allow bacteria to survive antibiotics
+biomedical,What is the blood-brain barrier and its function?,Selective semipermeable border that protects the brain from pathogens and toxins
+biomedical,How do mRNA vaccines work?,mRNA instructs cells to produce spike protein triggering immune response
+biomedical,What is the difference between Type 1 and Type 2 diabetes?,Type 1 is autoimmune destruction of beta cells Type 2 is insulin resistance
+biomedical,What are the stages of clinical trials?,Phase 1 safety Phase 2 efficacy Phase 3 large scale Phase 4 post market
+biomedical,What is the role of hemoglobin in oxygen transport?,Hemoglobin binds oxygen in lungs and releases it in tissues
+biomedical,How do statins lower cholesterol?,Statins inhibit HMG-CoA reductase enzyme reducing cholesterol synthesis in the liver
+biomedical,What is the function of insulin in the body?,Insulin allows cells to absorb glucose from blood for energy production
+biomedical,What are the risk factors for stroke?,High blood pressure diabetes smoking obesity and atrial fibrillation
+biomedical,How does chemotherapy target cancer cells?,Chemotherapy drugs target rapidly dividing cells disrupting DNA replication and cell division
+biomedical,What is the role of the immune system in autoimmune diseases?,The immune system mistakenly attacks healthy body tissues causing inflammation and damage
+travel,What are the best tourist attractions in Paris?,Eiffel Tower Louvre Museum Notre-Dame Cathedral Champs-Elysees Montmartre
+travel,How do I get a travel visa for Japan?,Apply at Japanese embassy with passport photos itinerary and financial documents
+travel,What is the best time to visit Thailand?,November to February for cool dry weather avoiding monsoon season
+travel,What are the top destinations in South America?,Machu Picchu Rio de Janeiro Buenos Aires Galapagos Islands Patagonia
+travel,How do I find cheap flights to Europe?,Use flight comparison sites book in advance be flexible with dates fly midweek
+travel,What vaccinations do I need for traveling to Africa?,Yellow fever typhoid hepatitis A and B malaria prophylaxis and meningitis
+travel,What are the best islands to visit in Greece?,Santorini Mykonos Crete Rhodes and Corfu
+travel,How do I plan a backpacking trip through Southeast Asia?,Start in Bangkok travel overland through Laos Vietnam Cambodia budget 30-50 USD per day
+travel,What documents do I need for international travel?,Valid passport visa if required travel insurance return ticket proof of accommodation
+travel,What are the safest countries for solo travelers?,Iceland New Zealand Portugal Japan and Singapore
+travel,What is the best way to travel around Italy?,Train network connects major cities rent a car for countryside regions
+travel,How do I avoid jet lag on long flights?,Adjust sleep schedule before departure stay hydrated avoid alcohol sleep on the plane
+travel,What are must-see landmarks in London?,Big Ben Tower of London Buckingham Palace British Museum Westminster Abbey
+travel,What currency should I bring to Southeast Asia?,US dollars are widely accepted exchange to local currency at destination
+travel,What are the best national parks in the United States?,Yellowstone Grand Canyon Yosemite Zion and Glacier National Park
+finance,What is compound interest and how does it work?,Interest calculated on initial principal and accumulated interest growing exponentially over time
+finance,How do I start investing in the stock market?,Open a brokerage account research companies start with index funds diversify portfolio
+finance,What is the difference between a Roth IRA and traditional IRA?,Roth uses after-tax contributions with tax-free withdrawals traditional uses pre-tax contributions
+finance,How does a mortgage work?,Loan secured by property repaid in monthly installments of principal and interest over 15-30 years
+finance,What is portfolio diversification?,Spreading investments across different asset classes to reduce risk
+finance,How do credit scores work?,Numerical rating based on payment history credit utilization length of history and new credit
+finance,What are the benefits of dollar cost averaging?,Investing fixed amounts regularly reduces impact of market volatility over time
+finance,What is the difference between stocks and bonds?,Stocks represent ownership in a company bonds are loans to a company or government
+finance,How do mutual funds work?,Pooled investment vehicle managed professionally investing in diversified portfolio of securities
+finance,What is inflation and how does it affect savings?,General increase in prices reducing purchasing power of money over time
+finance,How do I create a personal budget?,Track income and expenses categorize spending set savings goals review monthly
+finance,What is the difference between bull and bear markets?,Bull market has rising prices and optimism bear market has falling prices and pessimism
+finance,How does the Federal Reserve affect interest rates?,Fed sets federal funds rate influencing borrowing costs throughout the economy
+finance,What are exchange-traded funds?,Investment funds traded on stock exchanges tracking an index sector or commodity
+finance,What is the rule of 72 in finance?,Divide 72 by annual return rate to estimate years needed to double investment
+grammar,i dont know weather to bring a umbrella today,I don't know whether to bring an umbrella today.
+grammar,their going to the store to by some grocerys for there party,They're going to the store to buy some groceries for their party.
+grammar,the company have decided to changes its policys effective immediatly,The company has decided to change its policies effective immediately.
+grammar,me and him went to the libary yesterday but it were closed,He and I went to the library yesterday but it was closed.
+grammar,she dont believe that the informations is accurrate,She doesn't believe that the information is accurate.
+grammar,the students which passed the exam was very happy about there results,The students who passed the exam were very happy about their results.
+grammar,he runned to the store becuse he needed to by milk,He ran to the store because he needed to buy milk.
+grammar,the commitee have not yet made they're desicion about the buget,The committee has not yet made their decision about the budget.
+grammar,its important that everyone understand there responsibilitys,It's important that everyone understands their responsibilities.
+grammar,the data shows that less people is using the old systam,The data show that fewer people are using the old system.
+grammar,him and me was suppose to finish the report by yestarday,He and I were supposed to finish the report by yesterday.
+grammar,the childrens toys was scattered accross the living room floor,The children's toys were scattered across the living room floor.
+grammar,she has went to the market allready but forgotted to buy eggs,She has gone to the market already but forgot to buy eggs.
+grammar,between you and I this companys managment needs alot of improvment,Between you and me this company's management needs a lot of improvement.
+grammar,the profesor aksed weather we had did our homwork on time,The professor asked whether we had done our homework on time.
