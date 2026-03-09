@@ -32,6 +32,7 @@ class DitExpert:
                 task,
                 model=model_name,
                 device_map="auto",
+                trust_remote_code=True,
                 model_kwargs={"load_in_8bit": True},
             )
             print(f"[DitExpert] Loaded {model_name} in 8-bit quantized mode.")
@@ -40,6 +41,7 @@ class DitExpert:
                 task,
                 model=model_name,
                 device_map="auto",
+                trust_remote_code=True,
                 model_kwargs={"load_in_4bit": True},
             )
             print(f"[DitExpert] Loaded {model_name} in 4-bit quantized mode.")
@@ -48,6 +50,7 @@ class DitExpert:
                 task,
                 model=model_name,
                 device_map="auto",
+                trust_remote_code=True,
                 torch_dtype=torch.float16,
             )
             print(f"[DitExpert] Loaded {model_name} in FP16 (no quantization).")

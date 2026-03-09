@@ -28,25 +28,24 @@ from routers.domain_router import DomainRouter
 from routers.domain_simplified_router import DomainSimplifiedRouter
 
 DEFAULT_MAPPING = {
-    "flan-t5": [
-        "travel", "country", "city", "airport", "tourism", "destination",
-        "flight", "hotel", "visa", "landmark", "continent", "island",
-        "ocean", "border", "capital", "resort", "cruise", "passport",
-    ],
-    "biomedlm": [
-        "sports", "game", "team", "player", "score", "match", "league",
-        "championship", "tournament", "coach", "athlete", "stadium",
-        "goal", "medal", "race", "olympic", "season", "draft",
-    ],
-    "tinyllama": [
+    "finance": [
         "finance", "money", "invest", "stock", "bank", "loan", "credit",
         "debt", "savings", "budget", "interest", "mortgage", "tax",
         "retirement", "portfolio", "dividend", "income", "expense",
+        "insurance", "asset", "liability", "equity", "fund", "bond",
     ],
-    "law-llm": [
+    "law": [
+        "law", "legal", "court", "statute", "contract", "rights", "attorney",
+        "trial", "judge", "jury", "criminal", "civil", "lawsuit", "defendant",
+        "plaintiff", "amendment", "constitution", "tort", "liability", "verdict",
+        "appeal", "warrant", "evidence", "crime", "penalty", "regulation",
+    ],
+    "gemma": [
+        "travel", "country", "city", "airport", "tourism", "destination",
+        "flight", "hotel", "visa", "landmark", "continent", "island",
+        "ocean", "border", "capital", "resort", "cruise", "passport",
         "literature", "book", "novel", "author", "poem", "story", "writer",
-        "fiction", "chapter", "genre", "literary", "publish", "library",
-        "narrative", "prose", "character", "essay", "playwright",
+        "fiction", "chapter", "genre", "library", "essay",
     ],
 }
 
