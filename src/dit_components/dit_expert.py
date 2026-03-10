@@ -1,5 +1,5 @@
 from typing import Optional, Any
-from transformers import pipeline
+from transformers import pipeline, BitsAndBytesConfig
 import torch
 
 class DitExpert:
@@ -28,21 +28,23 @@ class DitExpert:
             raise ValueError("Provide either `model` or both `task` and `model_name`.")
 
         if quantize == "8bit":
+            bnb_config = BitsAndBytesConfig(load_in_8bit=True)
             self.model = pipeline(
                 task,
                 model=model_name,
                 device_map="auto",
                 trust_remote_code=True,
-                model_kwargs={"load_in_8bit": True},
+                model_kwargs={"quantization_config": bnb_config},
             )
             print(f"[DitExpert] Loaded {model_name} in 8-bit quantized mode.")
         elif quantize == "4bit":
+            bnb_config = BitsAndBytesConfig(load_in_4bit=True)
             self.model = pipeline(
                 task,
                 model=model_name,
                 device_map="auto",
                 trust_remote_code=True,
-                model_kwargs={"load_in_4bit": True},
+                model_kwargs={"quantization_config": bnb_config},
             )
             print(f"[DitExpert] Loaded {model_name} in 4-bit quantized mode.")
         else:
